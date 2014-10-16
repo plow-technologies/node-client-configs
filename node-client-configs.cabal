@@ -1,11 +1,13 @@
 Name:                   node-client-configs
-Version:                0.1.0
+Version:                0.1.1
 Author:                 Lingpo Huang <lingpo.huang@plowtech.net>
 Maintainer:             Lingpo Huang <lingpo.huang@plowtech.net>
 License:                BSD3
 License-File:           LICENSE
 Synopsis:               Intermediary layer to use to communicate to the node manager
-Description:         Intermediary layer to use to communicate to the node manager   
+Description:            Intermediary layer to use to communicate to the node manager   
+homepage:               https://github.com/plow-technologies/node-client-configs/blob/master/readme.md
+extra-source-files:     README.md
 Cabal-Version:          >= 1.10
 Build-Type:             Simple
 
@@ -19,7 +21,6 @@ Library
                       , text
                       , aeson
                       , bytestring
-                      -- , system-fileio
                       , system-filepath
                       , streaming-commons
                       , http-client

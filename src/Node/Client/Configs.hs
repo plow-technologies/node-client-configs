@@ -16,8 +16,16 @@ Portability :  portable
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Node.Client.Configs where
-
+module Node.Client.Configs (  NodeManagerConfig
+                            , managerFilePath
+                            , nodeManagerPort
+                            , nodeManagerHost
+                            , MyHostPreference
+                            , getHostPreference
+                            , buildConfigName
+                            , readConfigFile
+                            , readNodeManagerConf
+                           ) where
 -- General
 import           Control.Applicative
 import           Control.Monad                   (mzero)
