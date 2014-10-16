@@ -1,0 +1,32 @@
+Name:                   node-client-configs
+Version:                0.0.0
+Author:                 Lingpo Huang <lingpo.huang@plowtech.net>
+Maintainer:             Lingpo Huang <lingpo.huang@plowtech.net>
+License:                BSD3
+License-File:           LICENSE
+Synopsis:               Intermediary layer to use to communicate to the node manager
+Description:         Intermediary layer to use to communicate to the node manager   
+Cabal-Version:          >= 1.10
+Build-Type:             Simple
+
+Library
+  Default-Language:     Haskell2010
+  HS-Source-Dirs:       src
+  GHC-Options:          -Wall
+  Exposed-Modules:      Node.Client.Configs
+  Other-Modules:        Node.Client.Configs.Internal
+  Build-Depends:        base >= 4 && < 5
+
+Test-Suite spec
+  Type:                 exitcode-stdio-1.0
+  Default-Language:     Haskell2010
+  Hs-Source-Dirs:       src
+                      , test
+  Ghc-Options:          -Wall
+  Main-Is:              Spec.hs
+  Build-Depends:        base
+                      , hspec
+
+Source-Repository head
+  Type:                 git
+  Location:             git@github.com:lhuang7/node-client-configs.git
