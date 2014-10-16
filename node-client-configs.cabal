@@ -1,5 +1,5 @@
 Name:                   node-client-configs
-Version:                0.0.0
+Version:                0.1.0
 Author:                 Lingpo Huang <lingpo.huang@plowtech.net>
 Maintainer:             Lingpo Huang <lingpo.huang@plowtech.net>
 License:                BSD3
@@ -16,6 +16,18 @@ Library
   Exposed-Modules:      Node.Client.Configs
   Other-Modules:        Node.Client.Configs.Internal
   Build-Depends:        base >= 4 && < 5
+                      , text
+                      , aeson
+                      , bytestring
+                      -- , system-fileio
+                      , system-filepath
+                      , streaming-commons
+                      , http-client
+                      , http-types
+                      , wreq
+                      , yaml
+                      , lens
+                     
 
 Test-Suite spec
   Type:                 exitcode-stdio-1.0
