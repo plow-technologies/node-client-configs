@@ -28,6 +28,11 @@ Library
                       , wreq
                       , yaml
                       , lens
+                      , servant
+                      , servant-server
+                      , servant-client
+                      , either < 4.5
+                      , lens-aeson < 1.1
                      
 
 Test-Suite spec
@@ -39,6 +44,22 @@ Test-Suite spec
   Main-Is:              Spec.hs
   Build-Depends:        base
                       , hspec
+                      , system-filepath
+                      , text
+                      , aeson
+                      , bytestring
+                      , system-filepath
+                      , streaming-commons
+                      , http-client
+                      , http-types
+                      , wreq
+                      , yaml
+                      , lens
+                      , servant
+                      , servant-server
+                      , servant-client
+                      , either < 4.5
+                      , lens-aeson < 1.1
 
 Source-Repository head
   Type:                 git

@@ -1,0 +1,4 @@
+node-manager-config:
+  managerFilePath:  "NodeManagerStates"
+  nodeManagerHost: localhost
+  nodeManagerPort: 2733
