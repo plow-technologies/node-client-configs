@@ -38,21 +38,23 @@ instance ToJSON NodeManagerConfig where
 ------------------------------ Servant ------------------------------
 
 
-type API = "configure" :> "edit" :> ReqBody '[JSON] Value :> Post '[JSON] Value
+type API = "configure" :> "retrieve" :> ReqBody '[JSON] Value :> Post '[JSON] Value
       :<|> "configure" :> "add" :> ReqBody '[JSON] Value :>  Post '[JSON] Value
       :<|> "configure" :> "delete" :> ReqBody '[JSON] Value :>  Post '[JSON] Value
       :<|> "configure" :> "copy" :> ReqBody '[JSON] Value :>  Post '[JSON] Value
       :<|> "clone" :> ReqBody '[JSON] Value :>  Post '[JSON] Value
       :<|> "configure" :> "get" :> Get '[JSON] Value
+      :<|> "configure" :> "edit" :> ReqBody '[JSON] Value :> Post '[JSON] Value
       :<|> Raw
 
 data NodeInterface = NodeInterface {
-                     editCfg   :: Value -> EitherT ServantError IO Value
-                   , addCfg    :: Value -> EitherT ServantError IO Value
-                   , deleteCfg :: Value -> EitherT ServantError IO Value
-                   , copyCfg   :: Value -> EitherT ServantError IO Value
-                   , cloneDir  :: Value -> EitherT ServantError IO Value
-                   , getCfg    :: EitherT ServantError IO Value
+                     retrieveCfg :: Value -> EitherT ServantError IO Value
+                   , addCfg      :: Value -> EitherT ServantError IO Value
+                   , editCfg     :: Value -> EitherT ServantError IO Value
+                   , deleteCfg   :: Value -> EitherT ServantError IO Value
+                   , copyCfg     :: Value -> EitherT ServantError IO Value
+                   , cloneDir    :: Value -> EitherT ServantError IO Value
+                   , getCfg      :: EitherT ServantError IO Value
 }
 
 userAPI :: Proxy API
@@ -60,13 +62,16 @@ userAPI = Proxy
 
 makeNodeAPI :: Monad m => NodeManagerConfig -> m NodeInterface
 makeNodeAPI cfg =
-  return $ NodeInterface editConfig addConfig deleteConfig copyConfig cloneDirectory getConfig
+  return $ NodeInterface retrieveConfig addConfig editConfig deleteConfig copyConfig cloneDirectory getConfig
   where
-    editConfig :: Value -> EitherT ServantError IO Value
+    retrieveConfig :: Value -> EitherT ServantError IO Value
     addConfig :: Value -> EitherT ServantError IO Value
     deleteConfig :: Value -> EitherT ServantError IO Value
     copyConfig :: Value -> EitherT ServantError IO Value
     cloneDirectory :: Value -> EitherT ServantError IO Value
     getConfig :: EitherT ServantError IO Value
+    editConfig :: Value -> EitherT ServantError IO Value
     -- docs :: EitherT ServantError IO Raw
-    editConfig :<|> addConfig :<|> deleteConfig :<|> copyConfig :<|> cloneDirectory :<|> getConfig :<|> docs = client userAPI (BaseUrl Http (nodeManagerHost cfg) (nodeManagerPort cfg))
+    retrieveConfig :<|> addConfig :<|> deleteConfig :<|> copyConfig :<|> cloneDirectory :<|> getConfig :<|> editConfig :<|> docs = client userAPI (BaseUrl Http (nodeManagerHost cfg) (nodeManagerPort cfg))
+
+--(toJSON (object ["alarm-state-config" .= object  [ ( "tag" .= 2), ("src" .= (object ["almKeySrc" .= (object [ "unSText" .=  "onping.plowtech.net"])])),  ("host" .= "www.stupidurl.com"), ("port".= 2)]]))

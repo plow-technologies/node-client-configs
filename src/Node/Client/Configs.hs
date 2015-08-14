@@ -72,7 +72,7 @@ readFromLocal fpath = do
 readFromNodeManager :: NodeManagerConfig -> Value -> IO (EitherT ServantError IO Value)
 readFromNodeManager nmcfg sendObject = do
   nodeAPI <- makeNodeAPI nmcfg
-  return $ editCfg nodeAPI sendObject
+  return $ retrieveCfg nodeAPI sendObject
 
 filePathToString :: OS.FilePath -> String
 filePathToString fpath =

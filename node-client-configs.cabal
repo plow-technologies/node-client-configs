@@ -60,6 +60,7 @@ Test-Suite spec
                       , servant-client
                       , either < 4.5
                       , lens-aeson < 1.1
+                      , transformers
 
 Source-Repository head
   Type:                 git
