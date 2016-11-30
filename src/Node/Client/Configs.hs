@@ -10,30 +10,18 @@ Portability :  portable
 
 <Function to read a config file from Node manager, if fail try to read from a local copy>
 -}
-{-# LANGUAGE DeriveDataTypeable  #-}
-{-# LANGUAGE DeriveGeneric       #-}
-{-# LANGUAGE NoImplicitPrelude   #-}
+
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Node.Client.Configs (  NodeManagerConfig
-                            , managerFilePath
-                            , nodeManagerPort
-                            , nodeManagerHost
-                            , MyHostPreference
-                            , getHostPreference
+module Node.Client.Configs (  module Node.Client.Types
                             , buildConfigName
                             , readConfigFile
                             , readNodeManagerConf
                            ) where
 -- General
-import           Control.Applicative
-import           Control.Monad                   (mzero)
 import           Data.Aeson
 import           Data.Text
-import           Data.Typeable                   (Typeable)
-import           GHC.Generics                    (Generic)
-import           Prelude
 -- File Reading
 import qualified Data.ByteString                 as BS
 import qualified Filesystem.Path.CurrentOS       as OS
@@ -49,39 +37,9 @@ import qualified Data.ByteString.Lazy            as LBS
 import           Network.HTTP.Client             (HttpException)
 import           Network.HTTP.Types
 import qualified Network.Wreq                    as W
-
--- Node ManagerConfig
--- ===============================
-data NodeManagerConfig = NodeManagerConfig {
-      managerFilePath :: Text
-    , nodeManagerHost :: MyHostPreference
-    , nodeManagerPort :: Int
-    } deriving (Read, Eq, Show, Typeable,Generic)
-
-
-instance FromJSON NodeManagerConfig where
-         parseJSON (Object o) = NodeManagerConfig <$>
-                        ((o .: "node-manager-config") >>= (.: "managerFilePath"))
-                    <*> ((o .: "node-manager-config") >>= (.: "nodeManagerHost"))
-                    <*> ((o .: "node-manager-config") >>= (.: "nodeManagerPort"))
-         parseJSON _ = mzero
-
-instance ToJSON NodeManagerConfig where
-         toJSON v = object ["node-manager-config" .= v]
-
--- Warp hostPreference inside our own type
-newtype MyHostPreference = MyHostPreference {
-      getHostPreference :: HostPreference} deriving (Eq,Read,Show,Typeable,Generic)
-
-instance FromJSON MyHostPreference where
-    parseJSON (String str) = return . MyHostPreference . Host . unpack $ str
-    parseJSON _ = fail "Parsing MyHostPreference Expected String, recieved Other"
-
-instance ToJSON MyHostPreference where
-   toJSON (MyHostPreference hPreference) =
-          case hPreference of
-               (Host hp) -> toJSON hp
-               _ -> toJSON (""::String)
+-- Local Types
+import           Node.Client.Types               (MyHostPreference (..),
+                                                  NodeManagerConfig (..))
 
 readNodeManagerConf :: OS.FilePath -> IO NodeManagerConfig
 readNodeManagerConf fPath = do
@@ -95,7 +53,7 @@ readFromLocal fpath = do
 
 buildNodeMangerAddress :: NodeManagerConfig -> String
 buildNodeMangerAddress nmcfg = host ++ ":" ++ port
-     where (Host host) = Node.Client.Configs.getHostPreference . nodeManagerHost $ nmcfg
+     where (Host host) = getHostPreference . nodeManagerHost $ nmcfg
            port = show . nodeManagerPort $ nmcfg
 
 sendHttpRequest :: String -> Value -> IO (Either Text LBS.ByteString)
@@ -106,33 +64,29 @@ sendHttpRequest url sendopts = do
       _ -> return $ Left  ("Error: Cannot received configs from NodeManager."::Text)
 
 readFromNodeManager :: NodeManagerConfig -> Value -> IO (Either Text LBS.ByteString)
-readFromNodeManager nmcfg sendObject = do
-    let nmAddress = buildNodeMangerAddress nmcfg
-        sendUrl = "http://" ++ nmAddress ++ "/configure/edit"
-    sendHttpRequest sendUrl sendObject
+readFromNodeManager nmcfg sendObject = sendHttpRequest sendUrl sendObject
+    where nmAddress = buildNodeMangerAddress nmcfg
+          sendUrl = "http://" ++ nmAddress ++ "/configure/edit"
 
 filePathToString :: OS.FilePath -> String
-filePathToString fpath =
-  case OS.toText fpath of
-       Left _-> "default.yml"::String
-       Right f -> unpack f
+filePathToString fpath = either (\_-> "default.yml"::String) unpack $ OS.toText fpath
 
 decodeConfig :: (FromJSON a, ToJSON a) => OS.FilePath -> LBS.ByteString-> IO a
 decodeConfig fpath value = either fail (\alcfg -> do
                                     encodeFile (filePathToString fpath) alcfg
                                     return alcfg) $ A.eitherDecode value
 
-buildConfigName :: Text -> String
-buildConfigName fPath = unpack . fst $ breakOn ("."::Text) fPath
-
 readConfigFile :: (FromJSON a, ToJSON a) => NodeManagerConfig -> OS.FilePath -> Value -> IO a
 readConfigFile nmcfg fpath sendObj =
   case OS.toText fpath of
          Left  e -> fail (unpack e)
-         Right _cfName -> do
+         Right cfName -> do
             rslt <- try $ readFromNodeManager nmcfg sendObj
             case rslt of
              Left (_e::HttpException) -> readFromLocal fpath
              Right alcfg -> do
-                   putStrLn "Decdoe the Alarmlog Config"
+                   putStrLn $ "Successfully Decode " ++ unpack cfName
                    either (\_ -> readFromLocal fpath) (decodeConfig fpath) alcfg
+
+buildConfigName :: Text -> String
+buildConfigName fPath = unpack . fst $ breakOn ("."::Text) fPath
