@@ -38,6 +38,7 @@ Test-Suite spec
                       , test
   Ghc-Options:          -Wall
   Main-Is:              Spec.hs
+  Other-Modules:        Node.Client.ConfigsSpec
   Build-Depends:        base
                       , hspec
 
