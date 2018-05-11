@@ -1,5 +1,5 @@
 Name:                   node-client-configs
-Version:                0.1.3
+Version:                0.2.0
 Author:                 Lingpo Huang <lingpo.huang@plowtech.net>
 Maintainer:             Lingpo Huang <lingpo.huang@plowtech.net>
 License:                BSD3
@@ -38,6 +38,7 @@ Test-Suite spec
                       , test
   Ghc-Options:          -Wall
   Main-Is:              Spec.hs
+  Other-Modules:        Node.Client.ConfigsSpec
   Build-Depends:        base
                       , hspec
 

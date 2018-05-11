@@ -43,8 +43,8 @@ import           Node.Client.Types               (MyHostPreference (..),
 
 readNodeManagerConf :: OS.FilePath -> IO NodeManagerConfig
 readNodeManagerConf fPath = do
-	fCont <- BS.readFile (OS.encodeString fPath)
-	either fail return $ decodeEither fCont
+    fCont <- BS.readFile (OS.encodeString fPath)
+    either fail return $ decodeEither fCont
 
 readFromLocal :: FromJSON a => OS.FilePath -> IO a
 readFromLocal fpath = do
